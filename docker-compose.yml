@@ -1,0 +1,30 @@
+version: "3.8"
+services:
+  db:
+    build: ./database/
+    ports:
+      - 5433:5432
+    volumes:
+      - ./postgres:/docker-entrypoint-initdb.d
+    networks:
+      - app-tier
+  app :
+    build: ./app/
+    depends_on:
+      - db      
+    ports:
+      - 9000:9000
+    networks:
+      - app-tier   
+  adminer:
+    image: adminer
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - db
+    networks:
+      - app-tier
+networks:
+  app-tier:
+    driver: bridge
