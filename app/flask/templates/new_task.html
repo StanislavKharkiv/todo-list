@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    form {
+        margin: auto;
+        margin-top: 100px;
+        width: 400px;
+        padding: 50px;
+        box-shadow: 0 0 8px black;
+        border-radius: 5px;
+    }
+
+    input,
+    textarea,
+    button {
+        display: block;
+        width: 200px;
+        margin: auto;
+        margin-bottom: 8px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method='post' action='/tasks?method=post'>
+    <input name='name' placeholder='Name' required />
+    <textarea name='comment' placeholder='Comment' required></textarea>
+    <button type='submit'>submit</button>
+</form>
+{% endblock %}

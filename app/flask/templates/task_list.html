@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block style %}
+<style>
+    .task {
+        display: flex;
+        justify-content: space-between;
+        padding: 10px;
+        margin: auto;
+        margin-bottom: 8px;
+        border: 2px solid gray;
+        border-radius: 5px;
+        max-width: 500px;
+    }
+
+    button {
+        margin: 5px;
+    }
+
+    .delete {
+        color: red;
+        border: 1px solid red;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<ul>
+    {% for task in tasks %}
+    <li class="task">
+        <div {{ 'style=text-decoration:line-through;' if task[3] else '' }}>
+            <h4>{{ task[1] }}</h4>
+            <p>{{ task[2] }}</p>
+        </div>
+        <div>
+            <form method='post' action='/tasks?method=patch&id={{ task[0] }}'>
+                <button class="complete">Complete</button>
+            </form>
+            <form method='post' action='/tasks?method=delete&id={{ task[0] }}'>
+                <button class="delete">Delete</button>
+            </form>
+        </div>
+
+    </li>
+    {% endfor %}
+</ul>
+{% endblock %}

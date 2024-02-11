@@ -14,6 +14,8 @@ services:
       - db      
     ports:
       - 9000:9000
+    volumes:
+      - ./app/flask:/code
     networks:
       - app-tier   
   adminer:

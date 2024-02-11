@@ -1,0 +1,17 @@
+<!doctype html>
+<title>Tasks</title>
+<style>
+    a {
+        font-size: 20px;
+        padding: 10px;
+    }
+</style>
+{% block style %}{% endblock %}
+<nav>
+    <a href="{{ url_for('index') }}">New</a>
+    <a href="{{ url_for('tasks') }}">Tasks</a>
+</nav>
+<hr>
+<section>
+    {% block content %}{% endblock %}
+</section>
