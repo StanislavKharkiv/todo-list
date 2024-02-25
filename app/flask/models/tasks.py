@@ -27,26 +27,47 @@ class TasksModel:
             """
         )
 
+        self.cursor.execute(
+            "ALTER TABLE Tasks ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT false;"
+        )
+
         self.conn.commit()
 
     def get_tasks(self):
-        self.cursor.execute("SELECT * FROM Tasks")
+        self.cursor.execute("SELECT * FROM Tasks WHERE is_deleted=false")
+        return self.cursor.fetchall()
+
+    def get_deleted_tasks(self):
+        self.cursor.execute("SELECT * FROM Tasks WHERE is_deleted=true")
         return self.cursor.fetchall()
 
     def add_task(self, task):
         self.cursor.execute(
-            "INSERT INTO Tasks (NAME, COMMENT) VALUES (%s, %s);",
-            (
-                task["name"],
-                task["comment"],
-            ),
+            "INSERT INTO Tasks (NAME, COMMENT, IS_DELETED) VALUES (%s, %s, %s);",
+            (task["name"], task["comment"], False),
         )
         self.conn.commit()
 
     def delete_task(self, id):
+        self.cursor.execute(
+            "UPDATE Tasks SET is_deleted = (%s) WHERE id=%s",
+            (
+                True,
+                id,
+            ),
+        )
+        self.conn.commit()
+
+    def delete_task_permanently(self, id):
         self.cursor.execute("DELETE FROM Tasks WHERE id=%s", (id,))
         self.conn.commit()
 
-    def patch_task(self, id):
-        self.cursor.execute("UPDATE Tasks SET COMPLETE = (%s) WHERE id=%s", (True, id,))
-        self.conn.commit() 
+    def complete_task(self, id):
+        self.cursor.execute(
+            "UPDATE Tasks SET COMPLETE = (%s) WHERE id=%s",
+            (
+                True,
+                id,
+            ),
+        )
+        self.conn.commit()
