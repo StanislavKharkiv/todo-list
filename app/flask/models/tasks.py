@@ -28,46 +28,40 @@ class TasksModel:
         )
 
         self.cursor.execute(
-            "ALTER TABLE Tasks ADD COLUMN IF NOT EXISTS is_deleted BOOLEAN DEFAULT false;"
+            "ALTER TABLE Tasks ADD COLUMN IF NOT EXISTS deleted BOOLEAN DEFAULT false;"
+        )
+
+        self.cursor.execute(
+            "ALTER TABLE Tasks ADD COLUMN IF NOT EXISTS delete_date TIMESTAMP ;"
         )
 
         self.conn.commit()
 
-    def get_tasks(self):
-        self.cursor.execute("SELECT * FROM Tasks WHERE is_deleted=false")
+    def db_request(self, sql_request):
+        self.cursor.execute(sql_request)
+        self.conn.commit()
+
+    def db_fetch(self, sql_request):
+        self.cursor.execute(sql_request)
         return self.cursor.fetchall()
+    
+    def get_tasks(self):
+        return self.db_fetch("SELECT * FROM Tasks WHERE deleted=false")
 
     def get_deleted_tasks(self):
-        self.cursor.execute("SELECT * FROM Tasks WHERE is_deleted=true")
-        return self.cursor.fetchall()
+        return self.db_fetch("SELECT * FROM Tasks WHERE deleted=true")
 
     def add_task(self, task):
-        self.cursor.execute(
-            "INSERT INTO Tasks (NAME, COMMENT, IS_DELETED) VALUES (%s, %s, %s);",
-            (task["name"], task["comment"], False),
-        )
-        self.conn.commit()
+        self.db_request(f"INSERT INTO Tasks (NAME, COMMENT) VALUES ('{task["name"]}', '{task["comment"]}');")
 
     def delete_task(self, id):
-        self.cursor.execute(
-            "UPDATE Tasks SET is_deleted = (%s) WHERE id=%s",
-            (
-                True,
-                id,
-            ),
-        )
-        self.conn.commit()
+        self.db_request(f"UPDATE Tasks SET deleted = {True}, delete_date = CURRENT_TIMESTAMP WHERE id={id}")
 
     def delete_task_permanently(self, id):
-        self.cursor.execute("DELETE FROM Tasks WHERE id=%s", (id,))
-        self.conn.commit()
+        self.db_request(f"DELETE FROM Tasks WHERE id={id}")
+    
+    def interval_deletion(self):
+        self.db_request("DELETE FROM Tasks WHERE delete_date <= CURRENT_TIMESTAMP - INTERVAL '1 day'") 
 
     def complete_task(self, id):
-        self.cursor.execute(
-            "UPDATE Tasks SET COMPLETE = (%s) WHERE id=%s",
-            (
-                True,
-                id,
-            ),
-        )
-        self.conn.commit()
+        self.db_request(f"UPDATE Tasks SET COMPLETE = ({True}) WHERE id={id}")
