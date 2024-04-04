@@ -5,9 +5,11 @@ services:
     ports:
       - 5433:5432
     volumes:
-      - ./postgres:/docker-entrypoint-initdb.d
+      - ./database/data:/var/lib/postgresql/data
     networks:
       - app-tier
+    env_file:
+      - .env
   app :
     build: ./app/
     depends_on:
@@ -18,9 +20,11 @@ services:
       - ./app/flask:/code
     networks:
       - app-tier   
+    command: /bin/bash -c "exec invoke run"
+    restart: on-failure
   adminer:
     image: adminer
-    restart: always
+    restart: on-failure
     ports:
       - 8080:8080
     depends_on:

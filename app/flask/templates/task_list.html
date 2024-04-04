@@ -36,7 +36,7 @@
             <form method='post' action='/tasks?method=patch&id={{ task[0] }}'>
                 <button class="complete">Complete</button>
             </form>
-            <form method='post' action='/tasks?method=delete&id={{ task[0] }}'>
+            <form method='post' action='/tasks?method=delete&id={{ task[0] }}{{ "&permanently=True" if delete else "" }}'>
                 <button class="delete">Delete</button>
             </form>
         </div>
