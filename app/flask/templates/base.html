@@ -5,14 +5,32 @@
         font-size: 20px;
         padding: 10px;
     }
+    nav {
+        display: flex;
+        justify-content: space-between;
+    }
+    .email {
+        text-align: center;
+        text-decoration: underline;
+    }
 </style>
 {% block style %}{% endblock %}
 <nav>
-    <a href="{{ url_for('index') }}">New</a>
-    <a href="{{ url_for('tasks') }}">Tasks</a>
-    <a href="{{ url_for('deleted_tasks') }}">Deleted tasks</a>
+    <div>
+        <a href="{{ url_for('index') }}">New</a>
+        <a href="{{ url_for('tasks') }}">Tasks</a>
+        <a href="{{ url_for('deleted_tasks') }}">Deleted tasks</a>
+        {% if not is_logged %}
+            <a href="{{ url_for('signup') }}">Signup</a>
+            <a href="{{ url_for('login') }}">Login</a>
+        {% endif %}
+    </div>
+    {% if is_logged %}
+        <a href="{{ url_for('logout') }}">Logout</a>
+    {% endif %}
 </nav>
 <hr>
+<div class="email">{{ user_email }}</div>
 <section>
     {% block content %}{% endblock %}
 </section>

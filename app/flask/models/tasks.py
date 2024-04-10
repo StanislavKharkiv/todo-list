@@ -1,7 +1,9 @@
-class TasksModel:
-    def __init__(self, conn, cursor) -> None:
-        self.conn = conn
-        self.cursor = cursor
+from .base_connector import BaseConnector
+
+
+class TasksModel(BaseConnector):
+    def __init__(self):
+        super().__init__()
 
         self.cursor.execute(
             """
@@ -37,14 +39,6 @@ class TasksModel:
 
         self.conn.commit()
 
-    def db_request(self, sql_request):
-        self.cursor.execute(sql_request)
-        self.conn.commit()
-
-    def db_fetch(self, sql_request):
-        self.cursor.execute(sql_request)
-        return self.cursor.fetchall()
-    
     def get_tasks(self):
         return self.db_fetch("SELECT * FROM Tasks WHERE deleted=false")
 
@@ -52,16 +46,26 @@ class TasksModel:
         return self.db_fetch("SELECT * FROM Tasks WHERE deleted=true")
 
     def add_task(self, task):
-        self.db_request(f"INSERT INTO Tasks (NAME, COMMENT) VALUES ('{task["name"]}', '{task["comment"]}');")
+        self.db_execute(
+            "INSERT INTO Tasks (NAME, COMMENT) VALUES (%s, %s);",
+            (task["name"], task["comment"]),
+        )
+        self.conn.commit()
 
     def delete_task(self, id):
-        self.db_request(f"UPDATE Tasks SET deleted = {True}, delete_date = CURRENT_TIMESTAMP WHERE id={id}")
+        self.db_execute(
+            "UPDATE Tasks SET deleted = True, delete_date = CURRENT_TIMESTAMP WHERE id=%s",
+            (id,),
+        )
 
     def delete_task_permanently(self, id):
-        self.db_request(f"DELETE FROM Tasks WHERE id={id}")
-    
+        self.db_execute("DELETE FROM Tasks WHERE id=%s", (id,))
+
     def interval_deletion(self):
-        self.db_request("DELETE FROM Tasks WHERE delete_date <= CURRENT_TIMESTAMP - INTERVAL '1 day'") 
+        print('CRON task ---')
+        self.db_execute(
+            "DELETE FROM Tasks WHERE delete_date <= CURRENT_TIMESTAMP - INTERVAL '1 day'"
+        )
 
     def complete_task(self, id):
-        self.db_request(f"UPDATE Tasks SET COMPLETE = ({True}) WHERE id={id}")
+        self.db_execute("UPDATE Tasks SET COMPLETE = (True) WHERE id=%s", (id,))

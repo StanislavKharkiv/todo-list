@@ -1,8 +1,12 @@
+import secrets
+
 from flask import Flask
 from routes import routes
 import models.main
 
 app = Flask(__name__)
+app.secret_key = secrets.token_urlsafe(16)
+
 
 routes(app)
 
