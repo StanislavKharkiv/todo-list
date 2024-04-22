@@ -1,21 +1,18 @@
 import psycopg2
+from psycopg2.extras import RealDictCursor
 
 try:
     conn = psycopg2.connect(
         host="db", database="postgres", user="admin", password="secret"
     )
-    cursor = conn.cursor()
+    cursor = conn.cursor(cursor_factory=RealDictCursor)
     print("DATABASE connected!!!!!")
 except (Exception, psycopg2.Error) as error:
     print("Error while fetching data from PostgreSQL", error)
 
 
 class BaseConnector:
-    # def __new__(cls):
-    #     if not hasattr(cls, 'instance'):
-    #         cls.instance = super(BaseConnector, cls).__new__(cls)
-    #     return cls.instance
-    
+
     def __init__(self):
         self.conn = conn
         self.cursor = cursor

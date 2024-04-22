@@ -12,20 +12,9 @@ class TasksModel(BaseConnector):
                 ID SERIAL PRIMARY KEY,
                 NAME TEXT NOT NULL,
                 COMMENT TEXT NOT NULL,
-                COMPLETE BOOLEAN DEFAULT false
+                COMPLETE BOOLEAN DEFAULT false,
+                USER_ID INT NOT NULL
             )
-            """
-        )
-
-        self.cursor.execute(
-            """
-            DO $$
-            BEGIN
-                IF (SELECT COUNT(*) FROM Tasks) = 0 THEN
-                    INSERT INTO Tasks (NAME, COMMENT)
-                    VALUES ('Example', 'do something for example...');
-                END IF;
-            END $$;
             """
         )
 
@@ -39,16 +28,20 @@ class TasksModel(BaseConnector):
 
         self.conn.commit()
 
-    def get_tasks(self):
-        return self.db_fetch("SELECT * FROM Tasks WHERE deleted=false")
+    def get_tasks(self, user_id):
+        return self.db_fetch(
+            f"SELECT * FROM Tasks WHERE deleted=false AND user_id={user_id}"
+        )
 
-    def get_deleted_tasks(self):
-        return self.db_fetch("SELECT * FROM Tasks WHERE deleted=true")
+    def get_deleted_tasks(self, user_id):
+        return self.db_fetch(
+            f"SELECT * FROM Tasks WHERE deleted=true AND user_id={user_id}"
+        )
 
-    def add_task(self, task):
+    def add_task(self, task, user_id):
         self.db_execute(
-            "INSERT INTO Tasks (NAME, COMMENT) VALUES (%s, %s);",
-            (task["name"], task["comment"]),
+            "INSERT INTO Tasks (NAME, COMMENT, USER_ID) VALUES (%s, %s, %s);",
+            (task["name"], task["comment"], user_id),
         )
         self.conn.commit()
 
@@ -62,7 +55,6 @@ class TasksModel(BaseConnector):
         self.db_execute("DELETE FROM Tasks WHERE id=%s", (id,))
 
     def interval_deletion(self):
-        print('CRON task ---')
         self.db_execute(
             "DELETE FROM Tasks WHERE delete_date <= CURRENT_TIMESTAMP - INTERVAL '1 day'"
         )
