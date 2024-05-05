@@ -1,0 +1,42 @@
+{% block style %}
+<style>
+    h1 {
+        text-align: center;
+    }
+
+    form {
+        margin: auto;
+        margin-top: 100px;
+        width: 400px;
+        padding: 50px;
+        box-shadow: 0 0 8px black;
+        border-radius: 5px;
+    }
+
+    input,
+    button {
+        display: block;
+        width: 200px;
+        margin: auto;
+        margin-bottom: 8px;
+    }
+
+    .error {
+        color: red;
+        text-align: center;
+        margin: 2px 0;
+        font-size: 14px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<form method='post' action='/signup?method=post'>
+    <h1>Signup</h1>
+    <input value="{{ email }}" name='email' placeholder='Email' required minlength="2" />
+    <p class="error">{{ email_error }}</p>
+    <input value="{{ password }}" name='password' placeholder='Password' type="password" required minlength="8" />
+    <p class="error">{{ password_error }}</p>
+    <button type='submit'>submit</button>
+</form>
+{% endblock %}

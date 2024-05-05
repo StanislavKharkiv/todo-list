@@ -11,6 +11,10 @@
         border-radius: 5px;
     }
 
+    h2 {
+        text-align: center;
+    }
+
     input,
     textarea,
     button {
@@ -24,6 +28,7 @@
 
 {% block content %}
 <form method='post' action='/tasks?method=post'>
+    <h2>Create new task</h2>
     <input name='name' placeholder='Name' required />
     <textarea name='comment' placeholder='Comment' required></textarea>
     <button type='submit'>submit</button>
