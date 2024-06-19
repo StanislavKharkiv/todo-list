@@ -3,12 +3,10 @@ services:
     build: ./database/
     ports:
       - 5433:5432
-    volumes:
-      - ./database/data:/var/lib/postgresql/data
-    networks:
-      - app-tier
-    env_file:
-      - .env
+    environment:
+      - POSTGRES_DB=postgres-test
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=secret
     healthcheck:
       test:
         [
@@ -27,11 +25,9 @@ services:
       - 9000:9000
     volumes:
       - ./app/flask:/code
-    networks:
-      - app-tier
-    command: /bin/bash -c "exec invoke run"
+    command: /bin/bash -c "python -u server.py & python -m unittest tests/test_models.py & coverage report -m --omit=tests/*"
     environment:
-      - POSTGRES_DB=postgres
+      - POSTGRES_DB=postgres-test
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
   adminer:
@@ -41,8 +37,3 @@ services:
       - 8080:8080
     depends_on:
       - db
-    networks:
-      - app-tier
-networks:
-  app-tier:
-    driver: bridge

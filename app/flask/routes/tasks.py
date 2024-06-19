@@ -16,7 +16,7 @@ def tasks(app):
         if request.method == "POST":
             form_method = request.args.get("method")
             if form_method == "post":
-                models.tasks.add_task(request.form, user['id'])
+                models.tasks.add_task(request.form, user["id"])
                 return redirect("/tasks")
 
             elif form_method == "delete":
@@ -35,12 +35,12 @@ def tasks(app):
                 return redirect("/tasks")
 
         else:
-            task_list = models.tasks.get_tasks(user['id'])
+            task_list = models.tasks.get_tasks(user["id"])
             return render_template("task_list.html", tasks=task_list)
 
     @app.route("/tasks/deleted")
     @login_required
     def deleted_tasks():
         user = session.get("user")
-        task_list = models.tasks.get_deleted_tasks(user['id'])
+        task_list = models.tasks.get_deleted_tasks(user["id"])
         return render_template("task_list.html", tasks=task_list, delete=True)

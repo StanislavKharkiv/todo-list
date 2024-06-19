@@ -5,3 +5,5 @@ __pycache__
 database/data
 
 .env
+
+.coverage

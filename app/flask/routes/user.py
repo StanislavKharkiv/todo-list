@@ -47,7 +47,7 @@ def user(app):
             password = request.form["password"].strip()
             hashed_password = hashlib.sha256(password.encode())
             user = models.users.find_by_email(email)
-            if len(user) > 0 and user[0]['password'] == hashed_password.hexdigest():
+            if user and user[0]["password"] == hashed_password.hexdigest():
                 session["user"] = user[0]
                 return redirect("/")
             else:
