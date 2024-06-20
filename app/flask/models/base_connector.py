@@ -4,7 +4,7 @@ import os
 
 try:
     conn = psycopg2.connect(
-        host="db", database=os.getenv('POSTGRES_DB'), user=os.getenv('POSTGRES_USER'), password=os.getenv('POSTGRES_PASSWORD')
+        host=os.getenv('DB_SERVICE_NAME'), database=os.getenv('POSTGRES_DB'), user=os.getenv('POSTGRES_USER'), password=os.getenv('POSTGRES_PASSWORD')
     )
     cursor = conn.cursor(cursor_factory=RealDictCursor)
 except (Exception, psycopg2.Error) as error:

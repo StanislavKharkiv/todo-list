@@ -6,7 +6,7 @@ class TestModels(unittest.TestCase):
     email = "test@mail.com"
     password = "123456789"
 
-    def register_user(self, email=email):
+    def register_user_if_not_exist(self, email=email):
         user = models.users.find_by_email(email)
         if not user:
             hashed_password = hashlib.sha256(self.password.encode())
@@ -16,13 +16,13 @@ class TestModels(unittest.TestCase):
         return models.users.find_by_email(email)[0]
 
     def add_task(self, name="task name", comment="task comment"):
-        user = self.register_user()
+        user = self.register_user_if_not_exist()
         models.tasks.add_task({"name": name, "comment": comment}, user["id"])
         return user
 
     # USER
     def test_create_user(self):
-        user = self.register_user()
+        user = self.register_user_if_not_exist()
         self.assertIsNotNone(user)
         self.assertEqual(
             user["password"], hashlib.sha256(self.password.encode()).hexdigest()
@@ -30,7 +30,8 @@ class TestModels(unittest.TestCase):
 
     def test_delete_user(self):
         email = "delete@mail.com"
-        user = self.register_user(email)
+
+        user = self.register_user_if_not_exist(email)
         self.assertIsNotNone(user)
         models.users.delete_user(user["id"])
         user = models.users.find_by_email(email)
@@ -40,6 +41,7 @@ class TestModels(unittest.TestCase):
     def test_add_task(self):
         task_name = "task name"
         task_comment = "task comment"
+
         task_owner = self.add_task(task_name, task_comment)
         task_list = models.tasks.get_tasks(task_owner["id"])
         self.assertIsNotNone(task_list)
@@ -50,6 +52,7 @@ class TestModels(unittest.TestCase):
     def test_complete_task(self):
         task_name = "complete task name"
         task_comment = "complete task comment"
+
         task_owner = self.add_task(task_name, task_comment)
         task_list = models.tasks.get_tasks(task_owner["id"])
         task_list = [
@@ -65,17 +68,20 @@ class TestModels(unittest.TestCase):
     def test_delete_task(self):
         task_name = "delete task name"
         task_comment = "delete task name"
+
         task_owner = self.add_task(task_name, task_comment)
         task_list = models.tasks.get_tasks(task_owner["id"])
         task_list = [
             x for x in task_list if x["name"] == task_name and x["deleted"] == False
         ]
         deleted_task_id = task_list[0]["id"]
+
         models.tasks.delete_task(deleted_task_id)
         task_list = models.tasks.get_deleted_tasks(task_owner["id"])
         deleted_task = [x for x in task_list if x["id"] == deleted_task_id]
         self.assertNotEqual(deleted_task, [])
         self.assertEqual(deleted_task[0]["deleted"], True)
+        
         models.tasks.delete_task_permanently(deleted_task_id)
         task_list = models.tasks.get_tasks(task_owner["id"])
         deleted_task = [x for x in task_list if x["id"] == deleted_task_id]

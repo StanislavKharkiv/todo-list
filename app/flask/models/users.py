@@ -21,6 +21,7 @@ class UsersModel(BaseConnector):
             "INSERT INTO Users (EMAIL, PASSWORD) VALUES(%s, %s);",
             (data["email"], data["password"]),
         )
+        return self.db_fetch("SELECT * FROM Users WHERE email=%s", (data["email"],), 1)
 
     def find_by_email(self, email):
         return self.db_fetch("SELECT * FROM Users WHERE email=%s", (email,), 1)

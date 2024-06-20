@@ -1,8 +1,8 @@
 services:
-  db:
+  test-db:
     build: ./database/
     ports:
-      - 5433:5432
+      - 5434:5432
     environment:
       - POSTGRES_DB=postgres-test
       - POSTGRES_USER=admin
@@ -16,13 +16,13 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
-  app:
+  test-app:
     build: ./app/
     depends_on:
-      db:
+      test-db:
         condition: service_healthy
     ports:
-      - 9000:9000
+      - 9001:9000
     volumes:
       - ./app/flask:/code
     command: /bin/bash -c "python -u server.py & python -m unittest tests/test_models.py & coverage report -m --omit=tests/*"
@@ -30,10 +30,11 @@ services:
       - POSTGRES_DB=postgres-test
       - POSTGRES_USER=admin
       - POSTGRES_PASSWORD=secret
+      - DB_SERVICE_NAME=test-db
   adminer:
     image: adminer
     restart: on-failure
     ports:
       - 8080:8080
     depends_on:
-      - db
+      - test-db
