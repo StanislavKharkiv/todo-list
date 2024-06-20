@@ -1,12 +1,12 @@
 import psycopg2
 from psycopg2.extras import RealDictCursor
+import os
 
 try:
     conn = psycopg2.connect(
-        host="db", database="postgres", user="admin", password="secret"
+        host=os.getenv('DB_SERVICE_NAME'), database=os.getenv('POSTGRES_DB'), user=os.getenv('POSTGRES_USER'), password=os.getenv('POSTGRES_PASSWORD')
     )
     cursor = conn.cursor(cursor_factory=RealDictCursor)
-    print("DATABASE connected!!!!!")
 except (Exception, psycopg2.Error) as error:
     print("Error while fetching data from PostgreSQL", error)
 

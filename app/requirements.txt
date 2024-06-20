@@ -5,3 +5,5 @@ invoke
 six
 lexicon
 PyYAML
+unittest2==1.1.0
+coverage
