@@ -21,6 +21,12 @@
         color: red;
         border: 1px solid red;
     }
+
+    .date {
+        color: gray;
+        text-align: center;
+        text-decoration: underline;
+    }
 </style>
 {% endblock %}
 
@@ -33,12 +39,27 @@
             <p>{{ task['comment'] }}</p>
         </div>
         <div>
-            <form method='post' action='/tasks?method=patch&id={{ task["id"] }}'>
-                <button class="complete">Complete</button>
+            {% if delete %}
+                <form method='post' action='/tasks?method=patch&id={{ task["id"] }}&recover=true'>
+                    <button style="color: green;" class="complete">Recover</button>
+                </form>
+            {% else %}
+                {% if task['complete'] %}
+                <form method='post' action='/tasks?method=patch&id={{ task["id"] }}'>
+                    <button style="color: olive;" class="complete">not complete</button>
+                </form>
+                {% else %}
+                <form method='post' action='/tasks?method=patch&id={{ task["id"] }}&complete=true'>
+                    <button style="color: green;" class="complete">Complete</button>
+                </form>
+                {% endif %}
+            {% endif %}
+            <form method='post'
+                action='/tasks?method=delete&id={{ task["id"] }}{{ "&permanently=True" if delete else "" }}'>
+                <button class="delete">{{ 'Delete' if not delete else ' Delete forever' }}</button>
             </form>
-            <form method='post' action='/tasks?method=delete&id={{ task["id"] }}{{ "&permanently=True" if delete else "" }}'>
-                <button class="delete">Delete</button>
-            </form>
+            <div class="date">{{ task['create_date'].date() }}</div>
+            <div class="date">{{ task['create_date'].strftime('%H:%M') }} UTC</div>
         </div>
 
     </li>

@@ -2,6 +2,7 @@ import unittest
 import hashlib
 import models
 
+
 class TestModels(unittest.TestCase):
     email = "test@mail.com"
     password = "123456789"
@@ -81,11 +82,26 @@ class TestModels(unittest.TestCase):
         deleted_task = [x for x in task_list if x["id"] == deleted_task_id]
         self.assertNotEqual(deleted_task, [])
         self.assertEqual(deleted_task[0]["deleted"], True)
-        
+
         models.tasks.delete_task_permanently(deleted_task_id)
         task_list = models.tasks.get_tasks(task_owner["id"])
         deleted_task = [x for x in task_list if x["id"] == deleted_task_id]
         self.assertEqual(deleted_task, [])
+
+    def test_recover_deleted_task(self):
+        task_owner = self.add_task("recover", "recover this task")
+        task_list = models.tasks.get_tasks(task_owner["id"])
+        deleted_task_id = task_list[0]["id"]
+        models.tasks.delete_task(deleted_task_id)
+        task_list = models.tasks.get_deleted_tasks(task_owner["id"])
+        deleted_task = [x for x in task_list if x["id"] == deleted_task_id]
+        self.assertNotEqual(deleted_task, [])
+        self.assertEqual(deleted_task[0]["deleted"], True)
+
+        models.tasks.recover_task(deleted_task_id)
+        task_list = models.tasks.get_tasks(task_owner["id"])
+        recovered_task = [x for x in task_list if x["id"] == deleted_task_id][0]
+        self.assertEqual(recovered_task["deleted"], False)
 
 
 if __name__ == "__main__":

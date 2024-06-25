@@ -31,7 +31,17 @@ def tasks(app):
 
             elif form_method == "patch":
                 id = request.args.get("id")
-                models.tasks.complete_task(id)
+                is_complete = request.args.get("complete")
+                is_recover = request.args.get("recover")
+
+                if is_recover:
+                    models.tasks.recover_task(id)
+                    return redirect("/tasks")
+                
+                if is_complete:
+                    models.tasks.complete_task(id)
+                else:
+                    models.tasks.not_complete_task(id)
                 return redirect("/tasks")
 
         else:
