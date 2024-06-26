@@ -30,11 +30,8 @@ services:
     networks:
       - app-tier
     command: /bin/bash -c "exec invoke run"
-    environment:
-      - POSTGRES_DB=postgres
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=secret
-      - DB_SERVICE_NAME=db
+    env_file:
+      - .env
 
   adminer:
     image: adminer

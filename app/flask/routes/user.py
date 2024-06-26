@@ -3,7 +3,9 @@ import hashlib
 import models
 import settings
 from flask import request, render_template, redirect, session
+from smtplib import SMTP
 from .wraps import guest_route
+from utils import send_email
 
 
 def user(app):
@@ -35,6 +37,8 @@ def user(app):
                 models.users.signup(
                     {"email": email, "password": hashed_password.hexdigest()}
                 )
+                email_message = f"You are registered in task manager!<br/><a href='{request.url_root}'>Go login</a>"
+                send_email(email_message, email)
                 return "<h1>You are registered!</h2><a href='/'>Go login</a>"
         else:
             return render_template("signup.html")
