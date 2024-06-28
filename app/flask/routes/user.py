@@ -3,7 +3,6 @@ import hashlib
 import models
 import settings
 from flask import request, render_template, redirect, session
-from smtplib import SMTP
 from .wraps import guest_route
 from utils import send_email
 

@@ -1,6 +1,7 @@
 from datetime import datetime
 from .base_connector import BaseConnector
 
+
 class TasksModel(BaseConnector):
     def __init__(self):
         super().__init__()

@@ -66,6 +66,12 @@ class TestModels(unittest.TestCase):
         self.assertNotEqual(completed_task, [])
         self.assertEqual(completed_task[0]["complete"], True)
 
+        models.tasks.not_complete_task(completed_task_id)
+        task_list = models.tasks.get_tasks(task_owner["id"])
+        completed_task = [x for x in task_list if x["id"] == completed_task_id]
+        self.assertNotEqual(completed_task, [])
+        self.assertEqual(completed_task[0]["complete"], False)
+
     def test_delete_task(self):
         task_name = "delete task name"
         task_comment = "delete task name"
