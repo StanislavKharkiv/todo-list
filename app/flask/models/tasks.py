@@ -1,3 +1,4 @@
+from datetime import datetime
 from .base_connector import BaseConnector
 
 
@@ -13,7 +14,8 @@ class TasksModel(BaseConnector):
                 NAME TEXT NOT NULL,
                 COMMENT TEXT NOT NULL,
                 COMPLETE BOOLEAN DEFAULT false,
-                USER_ID INT NOT NULL
+                USER_ID INT NOT NULL,
+                CREATE_DATE TIMESTAMP NOT NULL
             )
             """
         )
@@ -24,6 +26,10 @@ class TasksModel(BaseConnector):
 
         self.cursor.execute(
             "ALTER TABLE Tasks ADD COLUMN IF NOT EXISTS delete_date TIMESTAMP ;"
+        )
+
+        self.cursor.execute(
+            "ALTER TABLE Tasks ADD COLUMN IF NOT EXISTS create_date TIMESTAMP NOT NULL;"
         )
 
         self.conn.commit()
@@ -40,14 +46,20 @@ class TasksModel(BaseConnector):
 
     def add_task(self, task, user_id):
         self.db_execute(
-            "INSERT INTO Tasks (NAME, COMMENT, USER_ID) VALUES (%s, %s, %s);",
-            (task["name"], task["comment"], user_id),
+            "INSERT INTO Tasks (NAME, COMMENT, USER_ID, CREATE_DATE) VALUES (%s, %s, %s, %s);",
+            (task["name"], task["comment"], user_id, datetime.now()),
         )
         self.conn.commit()
 
     def delete_task(self, id):
         self.db_execute(
             "UPDATE Tasks SET deleted = True, delete_date = CURRENT_TIMESTAMP WHERE id=%s",
+            (id,),
+        )
+
+    def recover_task(self, id):
+        self.db_execute(
+            "UPDATE Tasks SET deleted=false WHERE id=%s",
             (id,),
         )
 
@@ -61,3 +73,6 @@ class TasksModel(BaseConnector):
 
     def complete_task(self, id):
         self.db_execute("UPDATE Tasks SET COMPLETE = (True) WHERE id=%s", (id,))
+
+    def not_complete_task(self, id):
+        self.db_execute("UPDATE Tasks SET COMPLETE = (False) WHERE id=%s", (id,))
